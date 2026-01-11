@@ -1,0 +1,63 @@
+1. Install python 3.9.xx - 3.14.xx, be sure to add python to PATH while installing it.
+
+2. Install Microsoft Visual C++ Redistributable.
+
+https://aka.ms/vs/17/release/vc_redist.x64.exe
+
+3. Run install.bat.
+
+4. Install this Firefox add-on
+
+https://addons.mozilla.org/en-US/firefox/addon/cookies-txt-one-click/
+
+and go to hbomax.com and download the cookies, rename the file to default.txt and put it in
+
+fuckdl\Cookies\HBOMax
+
+For Amazon go to primevideo.com or amazon.com and download the cookies, rename the file to default.txt and put it in
+
+fuckdl\Cookies\Amazon
+
+For AppleTVPlus go to tv.apple.com and download the cookies, rename the file to default.txt and put it in
+
+fuckdl\Cookies\AppleTVPlus
+
+For iTunes go to tv.apple.com or music.apple.com and download the cookies, rename the file to default.txt and put it in
+
+fuckdl\Cookies\iTunes
+
+5. For the services that need credentials like DisneyPlus, Videoland, ParamountPlus, All4, RakutenTV and BritBox add the credentials in \fuckdl\fuckdl.yml, edit the file with notepad++.
+
+5. For downloading the video of an episode from primevideo.com use
+
+poetry run vt dl -al en -sl en -w S01E1 Amazon https://www.primevideo.com/region/eu/detail/0KRGHGZCHKS920ZQGY5LBRF7MA/
+
+ 
+If you want to downlod the video for a specific seasons use
+
+poetry run vt dl -al en -sl en -w S01 Amazon https://www.primevideo.com/region/eu/detail/0KRGHGZCHKS920ZQGY5LBRF7MA/
+
+6. For downloading from iTunes use
+
+poetry run vt dl -al tr -sl tr iTunes -m umc.cmc.2lj6d47e7094s6ss83j0uppdm
+
+to download in 4k use -v h265 or -r hdr or -r dv, to download in sd use -q sd
+
+For downloading from AppleTVPlus use
+
+poetry run vt dl -al en -sl en -w S01E01 AppleTVPlus https://tv.apple.com/us/show/big-beasts/umc.cmc.7d9yulmth1rvkwpij477qsqsk
+
+
+for more options use
+
+poetry run vt dl -h
+
+for the extra options in the services use
+
+poetry run vt dl Amazon -h
+
+instead of Amazon add the service name
+
+the extra options will be added after the service name
+
+7. Make a folder for the SL2000 or SL3000 in \fuckdl\devices and add in it bgroupcert.dat and zgpriv.dat and edit fuckdl.yml for adding the name of the folder, fuckdl will create prd file and reprovisioning it every an hour.

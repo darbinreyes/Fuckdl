@@ -14,6 +14,23 @@ FuckDL is a command-line program to download videos from Playready and Widevine 
 - Multiple downloader support (N_m3u8DL-RE, Aria2c, saldl)
 - DV+HDR support
 
+## Dependencies
+
+The following binaries must be available on your system. On macOS, install via Homebrew:
+
+```bash
+brew install aria2 bento4 mkvtoolnix ffmpeg
+```
+
+| Binary | Package | Purpose |
+|--------|---------|---------|
+| `aria2c` | `aria2` | Downloading segments |
+| `mp4decrypt` | `bento4` | Decrypting DRM-protected tracks |
+| `mkvmerge` | `mkvtoolnix` | Muxing tracks into MKV |
+| `ffmpeg` / `ffprobe` | `ffmpeg` | Repackaging and stream inspection |
+
+> **Note:** `shaka-packager` (the default decrypter in the upstream config) is not available via Homebrew. The config in this fork is set to use `mp4decrypt` instead.
+
 ## Installation
 
 ```bash
@@ -24,6 +41,14 @@ poetry install
 
 ```bash
 poetry run fuckdl dl --help
+```
+
+### Hulu example
+
+```bash
+# Hulu uses Widevine. Requires an L1 WVD device for UHD/HDR content.
+# With an L3 device, request SDR (default) to stay within L3 tier:
+poetry run fuckdl dl Hulu "https://www.hulu.com/movie/<id>"
 ```
 
 ## Supported Services

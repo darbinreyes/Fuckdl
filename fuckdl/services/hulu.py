@@ -20,7 +20,7 @@ class Hulu(BaseService):
 
     ALIASES = ["HULU"]
     #GEOFENCE = ["us"]
-    TITLE_RE = (r"^(?:https?://(?:www\.)?hulu\.com/(?P<type>movie|series)/)?(?:[a-z0-9-]+-)?"
+    TITLE_RE = (r"^(?:https?://(?:www\.)?hulu\.com/(?P<type>movie|series|watch)/)?(?:[a-z0-9-]+-)?"
                 r"(?P<id>[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12})")
 
     AUDIO_CODEC_MAP = {
@@ -57,6 +57,7 @@ class Hulu(BaseService):
             self.log.info(f"Switched video codec to H265 to be able to get {ctx.parent.params['range_']} dynamic range")
             self.vcodec = "H265"
 
+        self.range_ = ctx.parent.params.get("range_") or "SDR"
         self.device = None
         self.playback_params = {}
         self.hulu_client = None
@@ -210,19 +211,25 @@ class Hulu(BaseService):
             self.log.debug(res)
             return res
         else:
-            res = self.session.post(
+            self.log.info(f" + License URL: {self.license_url_widevine}")
+            saved_hooks = self.session.hooks.copy()
+            self.session.hooks = {}
+            r = self.session.post(
                 url=self.license_url_widevine,
-                data=challenge  # expects bytes
-            ).content
-            self.log.debug(res)
-            return res
+                data=challenge,
+                headers={"Content-Type": "application/octet-stream"},
+            )
+            self.session.hooks = saved_hooks
+            self.log.info(f" + License status: {r.status_code}, body: {r.text[:500]}")
+            r.raise_for_status()
+            return r.content
 
     # Service specific functions
 
     def configure(self):
         self.device = Device(
-            device_code=self.config["device"]["FireTV4K"]["code"],
-            device_key=self.config["device"]["FireTV4K"]["key"]
+            device_code=self.config["device"]["Chrome"]["code"],
+            device_key=self.config["device"]["Chrome"]["key"]
         )
         self.session.headers.update({
             "User-Agent": self.config["user_agent"],
@@ -237,7 +244,7 @@ class Hulu(BaseService):
             "playback": {
                 "version": 2,
                 "video": {
-                    "dynamic_range": "DOLBY_VISION",
+                    "dynamic_range": "DOLBY_VISION" if self.range_ in ("DV", "HDR10", "HLG") else "SDR",
                     "codecs": {
                         "values": [x for x in self.config["codecs"]["video"] if x["type"] == self.vcodec],
                         "selection_mode": self.config["codecs"]["video_selection"]

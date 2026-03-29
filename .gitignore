@@ -24,3 +24,5 @@ fuckdl/devices/
 
 # macOS
 .DS_Store
+.claude/settings.local.json
+.esn

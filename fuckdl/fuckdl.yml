@@ -6,12 +6,12 @@ arguments: {}
 
 aria2c:
   file_allocation: 'prealloc'
-  
+
 
 cdm:
   default: 'xiaomi_mi_a1_15.0.0_60ceee88_8159_l3'
   DisneyPlus: ''
-  Netflix: ''
+  Netflix: 'chrome_l3_l3_8162_2'
   Amazon: ''
   Max: ''
   AppleTVPlus: ''
@@ -23,7 +23,7 @@ cdm_api:
     key: ''
     device: ''
     type: ''
-    system_id: 
+    system_id:
     security_level:
 
 credentials:

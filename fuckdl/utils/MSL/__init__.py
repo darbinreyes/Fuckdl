@@ -61,7 +61,7 @@ class MSL:
                     offline=True
                 )
                 keyrequestdata = KeyExchangeRequest.Widevine(
-                    keyrequest=cdm.get_license_challenge(msl_keys.cdm_session)
+                    keyrequest=cdm.get_license_challenge(msl_keys.cdm_session, "netflix")
                 )
             else:
                 keyrequestdata = KeyExchangeRequest.AsymmetricWrapped(
@@ -321,10 +321,10 @@ class MSL:
             error_display = error.get("display")
             error_detail = re.sub(r" \(E3-[^)]+\)", "", error.get("detail", ""))
 
-            #if error_display:
-            #    self.log.critical(f"- {error_display}")
-            #if error_detail:
-            #    self.log.critical(f"- {error_detail}")
+            if error_display:
+                self.log.critical(f"- {error_display}")
+            if error_detail:
+                self.log.critical(f"- {error_detail}")
 
             if not (error_display or error_detail):
                 self.log.critical(f"- {error}")

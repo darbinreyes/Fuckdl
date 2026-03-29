@@ -5,6 +5,15 @@ import re
 import shutil
 import subprocess
 import sys
+
+_EXTRA_PATH = os.environ.get("PATH", "") + ":/usr/local/bin:/opt/homebrew/bin"
+
+def _which(*names):
+    for name in names:
+        found = shutil.which(name) or shutil.which(name, path=_EXTRA_PATH)
+        if found:
+            return found
+    return None
 import httpx
 import pproxy
 import requests
@@ -190,7 +199,7 @@ async def aria2c_hbomax_specific(uri, out, proxy=None):
     """Specialized aria2c download for HBO Max with fresh headers."""
     executable = "C:\\DRMLab\\binaries\\aria2c.EXE"
     if not os.path.isfile(executable):
-        executable = shutil.which("aria2c") or shutil.which("aria2")
+        executable = _which("aria2c", "aria2")
         if not executable:
             raise EnvironmentError("Aria2c executable not found...")
 
@@ -347,7 +356,7 @@ async def aria2c(uri, out, headers=None, proxy=None):
             print("HBO Max detected with valid headers, proceeding with provided headers...")
 
     # Continue with normal aria2c for non-HBO Max or HBO Max with valid headers
-    executable = shutil.which("aria2c") or shutil.which("aria2")
+    executable = _which("aria2c", "aria2")
     if not executable:
         raise EnvironmentError("Aria2c executable not found...")
 
@@ -444,7 +453,7 @@ async def saldl(uri, out, headers=None, proxy=None):
     if headers:
         headers.update({k: v for k, v in headers.items() if k.lower() != "accept-encoding"})
 
-    executable = shutil.which("saldl") or shutil.which("saldl-win64") or shutil.which("saldl-win32")
+    executable = _which("saldl", "saldl-win64", "saldl-win32")
     if not executable:
         raise EnvironmentError("Saldl executable not found...")
 
@@ -506,7 +515,7 @@ async def m3u8re(uri, out, headers=None, proxy=None):
     if headers:
         headers.update({k: v for k, v in headers.items() if k.lower() != "accept-encoding"})
 
-    executable = shutil.which("m3u8re") or shutil.which("N_m3u8DL-RE")
+    executable = _which("m3u8re", "N_m3u8DL-RE")
     if not executable:
         raise EnvironmentError("N_m3u8DL-RE executable not found...")
 

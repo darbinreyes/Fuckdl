@@ -1,11 +1,19 @@
 import json
+import os
+import shutil
 import subprocess
+
+_FFPROBE = (
+    shutil.which("ffprobe")
+    or shutil.which("ffprobe", path=os.environ.get("PATH", "") + ":/usr/local/bin:/opt/homebrew/bin")
+    or "ffprobe"
+)
 
 
 def ffprobe(uri):
     """Use ffprobe on the provided data to get stream information."""
     args = [
-        "ffprobe",
+        _FFPROBE,
         "-v", "quiet",
         "-of", "json",
         "-show_streams"

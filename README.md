@@ -19,15 +19,16 @@ FuckDL is a command-line program to download videos from Playready and Widevine 
 The following binaries must be available on your system. On macOS, install via Homebrew:
 
 ```bash
-brew install aria2 bento4 mkvtoolnix ffmpeg
+brew install aria2 bento4 mkvtoolnix ffmpeg libmediainfo
 ```
 
-| Binary | Package | Purpose |
-|--------|---------|---------|
+| Binary / Library | Package | Purpose |
+|------------------|---------|---------|
 | `aria2c` | `aria2` | Downloading segments |
 | `mp4decrypt` | `bento4` | Decrypting DRM-protected tracks |
 | `mkvmerge` | `mkvtoolnix` | Muxing tracks into MKV |
 | `ffmpeg` / `ffprobe` | `ffmpeg` | Repackaging and stream inspection |
+| `libmediainfo` | `libmediainfo` | Post-mux media info parsing |
 
 > **Note:** `shaka-packager` (the default decrypter in the upstream config) is not available via Homebrew. The config in this fork is set to use `mp4decrypt` instead.
 

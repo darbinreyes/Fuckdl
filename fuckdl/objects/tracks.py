@@ -688,7 +688,7 @@ class Track:
                 "-codec", "copy",
                 fixed_file
             ], check=True)
-            self.swap(fixed_file)
+            self._location = fixed_file
         except subprocess.CalledProcessError:
             pass
 

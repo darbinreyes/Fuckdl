@@ -783,10 +783,17 @@ def result(ctx, service, quality, range_, wanted, alang, slang, audio_only, subs
                     directories.temp,
                     f"{track.__class__.__name__}_{track.id}_{enc_label}.mp4"
                 )
-                if os.path.isfile(cached_file):
+                repackaged_file = cached_file + "_fixed.mkv"
+                if os.path.isfile(repackaged_file) and os.path.getsize(repackaged_file) > 0:
+                    log.info(" + Already processed, skipping")
+                    track._location = repackaged_file
+                    track.encrypted = False
+                elif os.path.isfile(cached_file) and os.path.getsize(cached_file) > 0:
                     log.info(" + Already downloaded, skipping")
                     track._location = cached_file
                 else:
+                    if os.path.isfile(cached_file):
+                        os.unlink(cached_file)  # remove 0-byte remnant
                     track.download(directories.temp, headers=service.session.headers, proxy=proxy)
                     log.info(" + Downloaded")
             if isinstance(track, VideoTrack) and track.needs_ccextractor_first and not no_subs:
@@ -861,7 +868,7 @@ def result(ctx, service, quality, range_, wanted, alang, slang, audio_only, subs
                 log.info(" + Decrypted")
   
 
-            if track.needs_repack or (config.decrypter == "mp4decrypt" and isinstance(track, (VideoTrack, AudioTrack))):
+            if (track.needs_repack or (config.decrypter == "mp4decrypt" and isinstance(track, (VideoTrack, AudioTrack)))) and not (track._location and track._location.endswith("_fixed.mkv")):
                 log.info("Repackaging stream with FFmpeg (to fix malformed streams)")
                 track.repackage()
                 log.info(" + Repackaged")

@@ -9,6 +9,15 @@ import shutil
 import subprocess
 import sys
 import uuid
+
+_EXTRA_PATH = os.environ.get("PATH", "") + ":/usr/local/bin:/opt/homebrew/bin"
+
+def _which(*names):
+    for name in names:
+        found = shutil.which(name) or shutil.which(name, path=_EXTRA_PATH)
+        if found:
+            return found
+    return None
 from collections import defaultdict
 from enum import Enum
 from io import BytesIO, TextIOWrapper
@@ -670,7 +679,7 @@ class Track:
         fixed_file = f"{self._location}_fixed.mkv"
         try:
             subprocess.run([
-                "ffmpeg", "-hide_banner",
+                _which("ffmpeg") or "ffmpeg", "-hide_banner",
                 "-loglevel", "panic",
                 "-i", self._location,
                 # Following are very important!
@@ -1528,7 +1537,7 @@ class Tracks:
         if not dovi_tool:
             raise EnvironmentError("dovi_tool executable not found in PATH or ./binaries/")
 
-        ffmpeg = shutil.which("ffmpeg")
+        ffmpeg = _which("ffmpeg")
         if not ffmpeg:
              raise EnvironmentError("ffmpeg executable not found.")
 
@@ -1628,7 +1637,7 @@ class Tracks:
         muxed_location = os.path.join(config.directories.downloads, os.path.basename(muxed_location))
 
         cl = [
-            "mkvmerge",
+            _which("mkvmerge") or "mkvmerge",
             "--output",
             muxed_location
         ]

@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Project runtime artifacts
+temp/
+fuckdl/logs/
+fuckdl/cache/
+fuckdl/key_store.db
+uv.lock
+poetry.lock
+
+# Sensitive / personal config
+fuckdl/cookies/
+fuckdl/devices/
+
+# macOS
+.DS_Store

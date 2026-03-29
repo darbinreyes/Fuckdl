@@ -7,6 +7,15 @@ import shutil
 import subprocess
 import sys
 import traceback
+
+_EXTRA_PATH = os.environ.get("PATH", "") + ":/usr/local/bin:/opt/homebrew/bin"
+
+def _which(*names):
+    for name in names:
+        found = shutil.which(name) or shutil.which(name, path=_EXTRA_PATH)
+        if found:
+            return found
+    return None
 from zlib import crc32
 from pathlib import Path
 from datetime import datetime, timedelta
@@ -769,8 +778,17 @@ def result(ctx, service, quality, range_, wanted, alang, slang, audio_only, subs
                     proxy = next(iter(service.session.proxies.values()), None)
                 else:
                     proxy = None
-                track.download(directories.temp, headers=service.session.headers, proxy=proxy)
-                log.info(" + Downloaded")
+                enc_label = "enc" if track.encrypted else "dec"
+                cached_file = os.path.join(
+                    directories.temp,
+                    f"{track.__class__.__name__}_{track.id}_{enc_label}.mp4"
+                )
+                if os.path.isfile(cached_file):
+                    log.info(" + Already downloaded, skipping")
+                    track._location = cached_file
+                else:
+                    track.download(directories.temp, headers=service.session.headers, proxy=proxy)
+                    log.info(" + Downloaded")
             if isinstance(track, VideoTrack) and track.needs_ccextractor_first and not no_subs:
                 ccextractor()
             if track.encrypted:
@@ -799,7 +817,7 @@ def result(ctx, service, quality, range_, wanted, alang, slang, audio_only, subs
                 if config.decrypter == "packager":
                     platform = {"win32": "win", "darwin": "osx"}.get(sys.platform, sys.platform)
                     names = ["shaka-packager", "packager", f"packager-{platform}"]
-                    executable = next((x for x in (shutil.which(x) for x in names) if x), None)
+                    executable = _which(*names)
                     if not executable:
                         raise log.exit(" - Unable to find packager binary")
                     dec = os.path.splitext(track.locate())[0] + ".dec.mp4"
@@ -823,7 +841,7 @@ def result(ctx, service, quality, range_, wanted, alang, slang, audio_only, subs
                     except subprocess.CalledProcessError:
                         raise log.exit(" - Failed!")
                 elif config.decrypter == "mp4decrypt": 
-                    executable = shutil.which("mp4decrypt")
+                    executable = _which("mp4decrypt")
                     if not executable:
                         raise log.exit(" - Unable to find mp4decrypt binary")
                     dec = os.path.splitext(track.locate())[0] + ".dec.mp4"
